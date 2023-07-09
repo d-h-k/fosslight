@@ -126,7 +126,7 @@ public interface ProjectService extends HistoryConfig{
 
 	List<List<ProjectIdentification>> convertLicenseNickName(List<List<ProjectIdentification>> ossComponentsLicense);
 
-	void addWatcher(Project project);
+	String addWatcher(Project project);
 
 	void removeWatcher(Project project);
 
@@ -195,6 +195,14 @@ public interface ProjectService extends HistoryConfig{
 	public Map<String, Object> getSecurityGridList(Project project);
 
 	public void registSecurity(String prjId, String tabName, List<OssComponents> ossComponents);
+
+	public List<Project> getProjectIdList(Project project);
+	
+	public Map<String, Object> getExportDataForSBOMInfo(OssNotice ossNotice);
+
+	public boolean checkReqEntrySecurity(Project project, String tabMenu);
+
+	public void copySecurityDataForProject(Project project);
 }
 
 

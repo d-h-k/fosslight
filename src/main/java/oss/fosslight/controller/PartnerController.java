@@ -299,6 +299,18 @@ public class PartnerController extends CoTopComponent{
 		return makeJsonResponseHeader(map);
 	}
 	
+	@GetMapping(value=PARTNER.AUTOCOMPLETE_CONF_ID_AJAX)
+	public @ResponseBody ResponseEntity<Object> autoCompleteConfIdAjax(
+			PartnerMaster partnerMaster
+			, HttpServletRequest req
+			, HttpServletResponse res
+			, Model model){
+		partnerMaster.setCreator(CommonFunction.isAdmin() ? "ADMIN" : loginUserName());
+		partnerMaster.setStatus(CoConstDef.CD_DTL_IDENTIFICATION_STATUS_CONFIRM);
+		
+		return makeJsonResponseHeader(partnerService.getPartnerIdList(partnerMaster));
+	}
+	
 	@GetMapping(value=PARTNER.AUTOCOMPLETE_CONF_NM_AJAX)
 	public @ResponseBody ResponseEntity<Object> autoCompleteConfAjax(
 			PartnerMaster partnerMaster
@@ -1056,7 +1068,7 @@ public class PartnerController extends CoTopComponent{
 			
 			try {
 				if (CoConstDef.FLAG_YES.equals(excel)){
-					if (list != null && !list.isEmpty() && CoCodeManager.getCodeExpString(CoConstDef.CD_FILE_ACCEPT, "22").contains(list.get(0).getFileExt())) {
+					if (list != null && !list.isEmpty() && CoCodeManager.getCodeExpString(CoConstDef.CD_FILE_ACCEPT, "22").contains(list.get(0).getFileExt().toLowerCase())) {
 
 						sheetNameList = ExcelUtil.getSheetNames(list, RESOURCE_PUBLIC_UPLOAD_EXCEL_PATH_PREFIX);
 					}

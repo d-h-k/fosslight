@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -222,7 +223,7 @@ public class ApiProjectController extends CoTopComponent {
 					if (modelListToUpdate != null) {
 						List<String[]> models = new ArrayList<>();
 						for (String strModel : modelListToUpdate) {
-							String[] model = strModel.split("\\|");
+							String[] model = strModel.replaceAll("\"", "").split("\\|");
 							if (model.length > 2) {
 								models.add(model);
 							}

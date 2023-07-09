@@ -207,6 +207,14 @@ public class ProjectController extends CoTopComponent {
 		
 	}
 	
+	@GetMapping(value = PROJECT.AUTOCOMPLETE_ID_AJAX)
+	public @ResponseBody ResponseEntity<Object> autoCompleteIdAjax(Project project, HttpServletRequest req,
+			HttpServletResponse res, Model model) {
+		project.setCreator(CommonFunction.isAdmin() ? "ADMIN" : loginUserName());
+		List<Project> list = projectService.getProjectIdList(project);
+		return makeJsonResponseHeader(list);
+	}
+	
 	/**
 	 * Auto complete version ajax.
 	 *
@@ -1701,6 +1709,8 @@ public class ProjectController extends CoTopComponent {
 				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}
+				
+				verificationService.changePackageFileNameDistributeFormat(ossNotice.getPrjId());
 			}
 		}
 		
@@ -3119,7 +3129,7 @@ public class ProjectController extends CoTopComponent {
 				userInfo.put("USER_ID", CoCodeManager.getCodeExpString(CoConstDef.CD_LDAP_SEARCH_INFO, CoConstDef.CD_DTL_LDAP_SEARCH_ID));
 				userInfo.put("USER_PW", CoCodeManager.getCodeExpString(CoConstDef.CD_LDAP_SEARCH_INFO, CoConstDef.CD_DTL_LDAP_SEARCH_PW));
 				
-				String filter = project.getPrjEmail().split("@")[0];
+				String filter = project.getPrjEmail();
 				
 				boolean isAuthenticated = userService.checkAdAccounts(userInfo, "USER_ID", "USER_PW", filter);
 				
@@ -3135,8 +3145,9 @@ public class ProjectController extends CoTopComponent {
 			}
 			
 			if (!isEmpty(project.getPrjUserId()) || !isEmpty(project.getPrjEmail())) {
-				projectService.addWatcher(project);
+				String addWatcher = projectService.addWatcher(project);
 				resultMap.put("isValid", "true");
+				resultMap.put("addWatcher", addWatcher);
 			} else {
 				return makeJsonResponseHeader(false, null);
 			}
@@ -4585,5 +4596,22 @@ public class ProjectController extends CoTopComponent {
 		}
 
 		return makeJsonResponseHeader(resMap);
+	}
+
+	@PostMapping(value = PROJECT.CHECK_REQ_ENTRY_SECURITY)
+	public @ResponseBody ResponseEntity<Object> checkReqEntrySecurity(@RequestBody HashMap<String, Object> map,
+			HttpServletRequest req, HttpServletResponse res, Model model) {
+		String prjId = (String)map.get("prjId");
+		String tabMenu = (String)map.get("tabMenu");
+		
+		Project param = new Project();
+		param.setPrjId(prjId);
+		
+		boolean reqEntryFlag = projectService.checkReqEntrySecurity(param, tabMenu);
+		if (!reqEntryFlag) {
+			return makeJsonResponseHeader();
+		} else {
+			return makeJsonResponseHeader(false, "checkReqEntry");
+		}
 	}
 }
